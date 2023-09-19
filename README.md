@@ -36,7 +36,7 @@ Before you can run this bot, make sure you have the following installed:
 7. Once the dependencies are installed, you can run the bot by executing:
 
    ```
-   python bot.py
+   python main.py
    ```
 
 
