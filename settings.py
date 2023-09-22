@@ -26,4 +26,6 @@ activities = [get_activity('gaming', 'Plague inc.'),
               get_activity('listening', 'to caveman sound'),
               get_activity('watching', 'How to build a nuclear bomb'),
               get_activity('competing', 'in a chess boxing match'),
-              get_activity('streaming', 'shrek', url='https://www.youtube.com/watch?v=8VgSyKl9vg0')]
+              get_activity('streaming', 'shrek',
+                           url='https://www.youtube.com/watch?v=8VgSyKl9vg0'),
+              get_activity('listening', 'theory will only take you so far')]
