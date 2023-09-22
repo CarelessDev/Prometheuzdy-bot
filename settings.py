@@ -15,7 +15,7 @@ def get_activity(activity_type: typing.Literal['gaming', 'listening', 'watching'
 
 
 
-initial_extensions = [os.path.splitext(name)[0].replace('\\', '.')  for name in glob.glob('cogs/*.py')]
+initial_extensions = [os.path.splitext(name)[0].replace('/', '.')  for name in glob.glob('cogs/*.py')]
 
 
 description = """
