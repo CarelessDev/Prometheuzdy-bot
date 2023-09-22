@@ -26,8 +26,6 @@ class Oppy(commands.Bot):
         self.CLIENT_ID = os.environ.get('CLIENT_ID')
         self.database = DB_Manager()
 
-   
-
     async def setup_hook(self):
         for extension in initial_extensions:
             try:
@@ -48,9 +46,6 @@ class Oppy(commands.Bot):
     @tasks.loop(seconds=300)
     async def background_task(self):
         await bot.change_presence(activity=choice(activities))
-
-
-
 
 
 if __name__ == "__main__":

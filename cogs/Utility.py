@@ -8,7 +8,6 @@ class Utility(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-
     @commands.hybrid_command(aliases=['link'])
     async def invite(self, ctx: commands.Context):
         """Invite the bot to your server"""
@@ -23,18 +22,11 @@ class Utility(commands.Cog):
         await ctx.defer()
         await ctx.channel.purge(limit=amount + 1)
 
-
-
     @commands.hybrid_command()
     async def ping(self, ctx: commands.Context):
         """Pong!"""
         await ctx.send(f'Pong! {round(self.bot.latency * 1000)}ms')
 
-    
-     
-
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Utility(bot))
-    
-    

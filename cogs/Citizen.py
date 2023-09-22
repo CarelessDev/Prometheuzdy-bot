@@ -7,6 +7,7 @@ import typing
 
 from utils.embeds import user_embed
 
+
 class Citizen(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
@@ -18,7 +19,8 @@ class Citizen(commands.Cog):
         self._routine = {}
 
     async def cog_unload(self) -> None:
-        self.bot.tree.remove_command(self.ctx_menu.name, type=self.ctx_menu.type)
+        self.bot.tree.remove_command(
+            self.ctx_menu.name, type=self.ctx_menu.type)
 
     async def set_phone_from_message(self, ctx: discord.Interaction, message: discord.Message) -> None:
         user_id = message.author.id
@@ -27,7 +29,7 @@ class Citizen(commands.Cog):
             self.bot.database.create_user(u)
         user = message.author
         phone = message.content
-        if (p:=self.bot.database.update_phone(user_id, phone)):
+        if (p := self.bot.database.update_phone(user_id, phone)):
             await ctx.response.send_message(f"Set phone number for {user.name} to {p}.")
         else:
             await ctx.response.send_message(f"Invalid phone number.")
@@ -48,7 +50,7 @@ class Citizen(commands.Cog):
         if not self.bot.database.check_user(user_id):
             u = User(user_id, user.name, "0", "0")
             self.bot.database.create_user(u)
-        if (p:=self.bot.database.update_phone(user_id, phone)):
+        if (p := self.bot.database.update_phone(user_id, phone)):
             await ctx.send(f"Set phone number for {user.name} to {p}.", ephemeral=ephemeral)
         else:
             await ctx.send(f"Invalid phone number.", ephemeral=ephemeral)
@@ -70,15 +72,18 @@ class Citizen(commands.Cog):
         class View(discord.ui.View):
             def __init__(self, bot, *, timeout: float = 180.0):
                 super().__init__(timeout=timeout)
+
                 class Dropdown(discord.ui.Select):
                     def __init__(self, bot: commands.Bot):
                         self.bot = bot
 
                         # dropdown menus
                         # using guild to fetch member instead of bot.get_user() so it will only show users in the guild
-                        options = [discord.SelectOption(label=ctx.guild.get_member(int(uid)).display_name, emoji=self.bot.get_emoji(911502994468651010), value=uid) for uid in all_users]
-                    
-                        super().__init__(placeholder='Choose your target...', min_values=1, max_values=1, options=options)
+                        options = [discord.SelectOption(label=ctx.guild.get_member(int(
+                            uid)).display_name, emoji=self.bot.get_emoji(911502994468651010), value=uid) for uid in all_users]
+
+                        super().__init__(placeholder='Choose your target...',
+                                         min_values=1, max_values=1, options=options)
 
                     async def callback(self, interaction: discord.Interaction):
                         await interaction.response.defer()
@@ -88,7 +93,7 @@ class Citizen(commands.Cog):
                             await interaction.message.edit(embed=embed, view=self.view)
                         else:
                             await interaction.edit_original_response(embed=embed, view=self.view)
-                        
+
                 self.add_item(Dropdown(bot))
 
             async def on_timeout(self):
@@ -96,7 +101,7 @@ class Citizen(commands.Cog):
                     child.disabled = True
                 await msg.edit(view=self)
                 return self.stop()
-            
+
         view = View(self.bot)
 
         user_id = user.id
@@ -108,7 +113,6 @@ class Citizen(commands.Cog):
 
         self._routine[ctx.user.id] = [msg, view]
 
+
 async def setup(bot: commands.Bot):
     await bot.add_cog(Citizen(bot))
-    
-    
