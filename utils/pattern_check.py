@@ -9,3 +9,13 @@ def phone_check(string: str):
         return "-".join(result.groups()[1:4])
     else:
         return False
+
+
+def url_check(string: str):
+    pattern = r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+    # print(re.match(pattern, string), string)
+    if re.match(pattern, string):
+        return string
+    else:
+        return False
+    

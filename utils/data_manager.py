@@ -7,6 +7,7 @@ from .pattern_check import phone_check
 
 
 PATH = "data/database.json"
+QR_PATH = "data/qr_codes"
 
 
 @dataclass
@@ -34,6 +35,11 @@ class DB_Manager:
         if not os.path.exists(self.path):
             os.makedirs(os.path.dirname(self.path), exist_ok=True)
             self.create_database()
+            logging.debug("Created database.")
+
+        if not os.path.exists(QR_PATH):
+            os.mkdir(QR_PATH)
+            logging.debug("Created QR code directory.")
 
         with open(self.path, "r") as f:
             if f.read() == "":
@@ -69,7 +75,7 @@ class DB_Manager:
             data['users'][str(user.id)] = user.__dict__
             json.dump(data, f, indent=4)
 
-    def update_phone(self, uid, phone: str):
+    def set_phone(self, uid, phone: str):
         if not (p := phone_check(phone)):
             return False
         data = self.get_data()
@@ -77,6 +83,14 @@ class DB_Manager:
             data['users'][str(uid)]['phone'] = p
             json.dump(data, f, indent=4)
         return p
+    
+    def set_qr(self, uid):
+        data = self.get_data()
+        with open(self.path, 'w') as f:
+            data['users'][str(uid)]['qr'] = os.path.join(QR_PATH, f"{uid}.png")
+            json.dump(data, f, indent=4)
+  
+
 
 
 if __name__ == "__main__":

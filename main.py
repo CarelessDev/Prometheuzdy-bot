@@ -13,7 +13,7 @@ from settings import description, get_activity, initial_extensions, activities
 class Oppy(commands.Bot):
     def __init__(self):
         super().__init__(
-            command_prefix=commands.when_mentioned_or('o!'),
+            command_prefix=commands.when_mentioned_or('oppydo '),
             description=description,
             pm_help=None,
             help_attrs=dict(hidden=True),
@@ -21,7 +21,6 @@ class Oppy(commands.Bot):
             heartbeat_timeout=150.0,
             intents=discord.Intents.all(),
             enable_debug_events=True,
-            activity=get_activity('playing', 'with your wife'),
         )
         self.CLIENT_ID = os.environ.get('CLIENT_ID')
         self.database = DB_Manager()
