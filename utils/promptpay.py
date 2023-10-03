@@ -24,11 +24,11 @@ COUNTRY_CODE_TH = "TH"
 
 class PromptPay:
     def __init__(self, phone_number):
-        self._phone_number = phone_number
+        self._phone_number = phone_number    # unsanitized phonenumber
     
     @property
     def phone_number(self):
-        return re.sub(r'\D', '', self._phone_number)
+        return re.sub(r'\D', '', self._phone_number)    
     
 
     @property
@@ -125,18 +125,53 @@ class PromptPay:
     
     @classmethod
     def to_QR(cls, phone_number: str, path: str, amount: float = 0) -> None:
-        """save QR code to path"""
+        """Save QR code to path
+        
+        Parameters
+        ----------
+        phone_number : str
+            phone number
+        path : str
+            filename
+        amount : float, optional
+            amount, by default 0
+            
+        Returns
+            None
+        """
         cls(phone_number).__to_QR(path, amount)
 
     @staticmethod
     def token2QR(token: str, path: str) -> None:
-        """save QR code to path"""
+        """Save QR code to path
+        
+        Parameters
+        ----------
+        token : str
+            promptpay payload
+        path : str
+            filename
+
+        Returns
+            None
+        """
         file = qrcode.make(token)
         file.save(path)
 
     @staticmethod
     def token2byte_QR(token: str) -> io.BytesIO:
-        """return QR code as byte"""
+        """Generate QR code as byte from phone number and amount
+        
+        Parameters
+        ----------
+        token : str
+            promptpay payload    
+        
+        Returns
+        -------
+        io.BytesIO
+            QR code as byte
+        """
         file = qrcode.make(token)
         byte_io = io.BytesIO()
         file.save(byte_io)
