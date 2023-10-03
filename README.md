@@ -2,6 +2,7 @@
 Khun thong oppenheimmer style 🕶️
 This is a simple Discord bot template written in Python using the Discord.py 2.0 library. 
 
+
 ## Prerequisites
 
 Before you can run this bot, make sure you have the following installed:
