@@ -4,6 +4,7 @@ import logging
 import os
 
 from .pattern_check import phone_check
+from .promptpay import PromptPay
 
 
 PATH = "data/database.json"
@@ -31,7 +32,18 @@ def log_data(func):
 
 class DB_Manager:
     def __init__(self, path: str = PATH) -> None:
-        self.path = PATH
+        self.path = path
+        self.ensure_database()
+        self.ensure_promptpay()
+
+        
+
+    def check_user(self, uid: int):
+        data = self.get_data()
+        return str(uid) in data['users'].keys()
+
+    
+    def ensure_database(self):
         if not os.path.exists(self.path):
             os.makedirs(os.path.dirname(self.path), exist_ok=True)
             self.create_database()
@@ -45,6 +57,16 @@ class DB_Manager:
             if f.read() == "":
                 self.create_database()
 
+    def ensure_promptpay(self):
+        data = self.get_data()
+        for uid in data['users'].keys():                                                                                #   for each user in database
+            if not data['users'][str(uid)].get('promptpay_token') and phone_check(data['users'][str(uid)]['phone']):        #   if promptpay_token not exist and phone is valid 
+                self.set_phone(uid, data['users'][str(uid)]['phone'])                                                       #   set phone number to generate promptpay_token
+                
+            
+    
+    # create functions ====================================================================================================
+
     def create_database(self):
         data = {
             "users": {}
@@ -52,13 +74,18 @@ class DB_Manager:
         with open(self.path, "w") as f:
             json.dump(data, f, indent=4)
 
+    @log_data
+    def create_user(self, user: User):
+        data = self.get_data()
+        with open(self.path, 'w') as f:
+            data['users'][str(user.id)] = user.__dict__
+            json.dump(data, f, indent=4)
+    
+    # get functions ====================================================================================================
+
     def get_data(self):
         with open(self.path, "r") as f:
             return json.load(f)
-
-    def check_user(self, uid: int):
-        data = self.get_data()
-        return str(uid) in data['users'].keys()
 
     def get_user(self, uid: int = None):
         with open(self.path, "r") as f:
@@ -68,12 +95,7 @@ class DB_Manager:
             else:
                 return data['users']
 
-    @log_data
-    def create_user(self, user: User):
-        data = self.get_data()
-        with open(self.path, 'w') as f:
-            data['users'][str(user.id)] = user.__dict__
-            json.dump(data, f, indent=4)
+    # update functions ====================================================================================================
 
     def set_phone(self, uid, phone: str):
         if not (p := phone_check(phone)):
@@ -81,6 +103,7 @@ class DB_Manager:
         data = self.get_data()
         with open(self.path, 'w') as f:
             data['users'][str(uid)]['phone'] = p
+            data['users'][str(uid)]['promptpay_token'] = str(PromptPay(p))
             json.dump(data, f, indent=4)
         return p
     

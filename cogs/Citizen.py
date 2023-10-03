@@ -8,6 +8,7 @@ import typing, os
 from utils.data_manager import User, QR_PATH
 from utils.embeds import user_embed, qr_confirmation_embed
 from utils.views import Show_User_View, Confirmation_View
+from utils.promptpay import PromptPay
 
 class Citizen(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
@@ -58,9 +59,10 @@ class Citizen(commands.Cog):
                 await m.edit(view=v)
         except HTTPException:
             pass
+
         all_users = self.bot.database.get_user()
 
-        view = Show_User_View(ctx, self.bot, all_users, user, timeout=180.0, ephemeral=ephemeral)
+        view = Show_User_View(ctx, self.bot, user, timeout=180.0, ephemeral=ephemeral)
 
         user_id = user.id
         if str(user_id) in all_users:
@@ -143,6 +145,21 @@ class Citizen(commands.Cog):
         if not user:
             user = interaction.user
         await self.__set_qr(interaction, qr, user, ephemeral)
+
+    @app_commands.command()
+    async def pay(self, interaction: discord.Interaction, amount: float = 0.00, user: typing.Union[discord.User, None] = None):
+        """Generate Promptpay QR code for a user. If no user is specified, the user who invoked the command will be used."""
+        if not user:
+            user = interaction.user
+        self.__ensure_user(user)
+        content = f"```Paying {user.display_name} {amount} Baht```" if amount else f"Paying {user.display_name}"
+        if (p := self.bot.database.get_user(user.id).get('phone')):
+            await interaction.response.send_message(content=content, file=discord.File(fp=PromptPay.to_byte_QR(p, amount), filename="qr.png"))
+        elif (qr:= self.bot.database.get_user(user.id).get('qr')):
+            await interaction.response.send_message(content=content, file=discord.File(fp=qr, filename="qr.png"))
+        else:
+            await interaction.response.send_message("User has not set their phone number or QR image.")
+
 
     # event listeners ====================================================================================================
 
