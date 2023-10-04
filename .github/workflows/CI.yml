@@ -1,20 +1,14 @@
 name: CI
 
-
 on:
-  pull_request:
-    branches:
-      - main
-    types:
-      - closed
-
+  push:
+    tags:
+      - "*.*"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    if: github.event.pull_request.merged == true
-    
     permissions:
       id-token: write
       packages: write
@@ -39,7 +33,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: ghcr.io/carelessdev/prometheuzdy-bot:latest
+          tags: ghcr.io/carelessdev/prometheuzdy-bot:latest,ghcr.io/carelessdev/prometheuzdy-bot:${{ github.ref_name }}
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
