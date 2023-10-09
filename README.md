@@ -20,10 +20,21 @@ Before you can run this bot, make sure you have the following installed:
 
 4. Create a file named `.env` in the project root directory.
 
-5. Inside the `.env` file, add the following line and paste your bot token after the `=` sign:
+5. In the `.env` file, define the following environment variables:
+   - `TOKEN`: Your API token or secret key.
+   - `DB_HOST`: The hostname or IP address of your database server.
+   - `DB_USER`: The username for connecting to the database.
+   - `DB_PASSWORD`: The password for the database user.
+   - `DB_NAME`: The name of your database.
 
-   ```
-   TOKEN="YOUR_BOT_TOKEN_HERE"
+   The `.env` file should look like this:
+
+   ```plaintext
+   TOKEN=your_api_token_here
+   DB_HOST=your_database_host_here
+   DB_USER=your_database_user_here
+   DB_PASSWORD=your_database_password_here
+   DB_NAME=your_database_name_here
    ```
 
    Replace `YOUR_BOT_TOKEN_HERE` with the actual token you copied in step 3.

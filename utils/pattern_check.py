@@ -19,8 +19,8 @@ def url_check(string: str):
     else:
         return False
     
-def qr_image_path_check(string: str):
-    if re.match(r"\d*.png$", string):
+def image_path_check(string: str):
+    if re.match(r"([-\w]+\.(?:jpg|gif|png))", string):
         return string
     else:
         return False

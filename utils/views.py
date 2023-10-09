@@ -1,5 +1,7 @@
 from __future__ import annotations
+from main import Oppy
 import discord
+import asyncio
 from discord.ext import commands
 
 from .promptpay import PromptPay
@@ -7,27 +9,31 @@ from .embeds import user_embed
 
 
 class Show_User_Dropdown(discord.ui.Select):
-    def __init__(self, bot: commands.Bot, view: Show_User_View, ephemeral: bool):
+    def __init__(self, bot: 'Oppy', view: Show_User_View, all_users: dict, ephemeral: bool):
         self._view = view
         self.bot = bot
         self.ctx = self.view.ctx
-        self.all_users = bot.database.get_user()
         self.ephemeral = ephemeral
         # dropdown menus
         # using guild to fetch member instead of bot.get_user() so it will only show users in the guild
         options = [discord.SelectOption(label=self.ctx.guild.get_member(int(
-            uid)).display_name, emoji=self.bot.get_emoji(911502994468651010), value=uid) for uid in self.all_users if self.ctx.guild.get_member(int(
-            uid))]
+            user['id'])).display_name, emoji=self.bot.get_emoji(911502994468651010), value=user['id']) for user in all_users]
 
         super().__init__(placeholder='Choose your target...',
                             min_values=1, max_values=1, options=options)
+        
+    
+    async def get_user(self, user: discord.Member) -> dict:
+        """returns a user from the database"""
+        return await self.bot.database.get_user(user=user)
 
     async def callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
-        self.all_users = self.bot.database.get_user()       # update all_users 
         user_id = int(self.values[0])
         self.view.user_id = user_id
-        embed, f = user_embed(self.all_users[str(user_id)], self.bot)
+        user = self.ctx.guild.get_member(user_id)
+        embed, f = user_embed(await self.get_user(user), user)
+
        
         attachments = [] 
         if isinstance(f, discord.File):
@@ -39,29 +45,17 @@ class Show_User_Dropdown(discord.ui.Select):
 
 class Show_User_View(discord.ui.View):
     msg: discord.Message = None
-    def __init__(self, ctx: commands.Context, bot, user: discord.User, *, timeout: float = 180.0, ephemeral: bool = False):
+    def __init__(self, ctx: commands.Context, bot: 'Oppy', user: discord.User, all_users: dict,  *, timeout: float = 180.0, ephemeral: bool = False):
         super().__init__(timeout=timeout)
         self.ctx = ctx
         self.user_id = user.id
         self.bot = bot
 
-        self.add_item(Show_User_Dropdown(bot, self, ephemeral))
+        self.add_item(Show_User_Dropdown(bot, self, all_users, ephemeral))
     
     @discord.ui.button(label="phone", style=discord.ButtonStyle.gray)
     async def send_phone(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message(self.bot.database.get_user()[str(self.user_id)]['phone'], ephemeral=True)
-
-    # deprecated
-    # @discord.ui.button(label="qr", style=discord.ButtonStyle.gray)
-    # async def send_qr(self, interaction: discord.Interaction, button: discord.ui.Button):
-    #     if (ppt:= self.all_users[str(self.user_id)].get('promptpay_token')):
-    #         await interaction.response.send_message(file=discord.File(fp=PromptPay.token2byte_QR(ppt), filename="qr.png"), ephemeral=True)
-    #         return
-            
-    #     try:
-    #         await interaction.response.send_message(None, file=discord.File(f"data/qr_codes/{self.user_id}.png"), ephemeral=True)
-    #     except FileNotFoundError:
-    #         await interaction.response.send_message("QR was not found.", ephemeral=True)
+        await interaction.response.send_message(await self.bot.database.get_user_phone(interaction.user), ephemeral=True)
 
     async def on_timeout(self):
         for child in self.children:
