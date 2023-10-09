@@ -15,6 +15,9 @@ from utils.data_manager import Database_Manager
 from settings import description, get_activity, initial_extensions, activities
 
 load_dotenv()
+
+print(os.environ.get("DB_PASS"))
+
 class Oppy(commands.Bot):
     def __init__(self, database_manager: Database_Manager, testing_guild_id: int = None):
         super().__init__(
