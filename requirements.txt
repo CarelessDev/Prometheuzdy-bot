@@ -6,5 +6,5 @@ qrcode==7.4.2
 aiohttp==3.8.5
 aiomysql==0.2.0
 mysql_connector_repackaged==0.3.1
-
+cryptography==41.0.4
 
