@@ -11,6 +11,7 @@ from utils.data_manager import QR_PATH
 from utils.embeds import user_embed, qr_confirmation_embed
 from utils.views import Show_User_View, Confirmation_View
 from utils.promptpay import PromptPay
+from utils.pattern_check import image_path_check
 
 class Citizen(commands.Cog):
     def __init__(self, bot: 'Oppy') -> None:
@@ -53,6 +54,7 @@ class Citizen(commands.Cog):
     async def __show_user(self, interaction: discord.Interaction, user: discord.Member, ephemeral: bool = False):
         """Shows the user's account information."""
         await interaction.response.defer(ephemeral=ephemeral)
+        await self.__ensure_user(user)
         try:
             if (old := self._routine.get(interaction.user.id)):
                 m, v = old
@@ -133,9 +135,9 @@ class Citizen(commands.Cog):
         await self.__set_phone(ctx, phone, user, ephemeral)
 
     @app_commands.command()
-    async def show_user(self, ctx: discord.Interaction, user: discord.Member, ephemeral: bool = False):
+    async def show_user(self, interaction: discord.Interaction, user: discord.Member, ephemeral: bool = False):
         """Shows the user's account information."""
-        await self.__show_user(ctx, user, ephemeral)
+        await self.__show_user(interaction, user, ephemeral)
 
     @app_commands.command()
     async def set_qr(self, interaction: discord.Interaction, qr: discord.Attachment, user: typing.Union[discord.User, None], ephemeral: bool = True):
@@ -151,7 +153,7 @@ class Citizen(commands.Cog):
             user = interaction.user
         await self.__ensure_user(user)
         content = f"```Paying {user.display_name} {amount} Baht```" if amount else f"Paying {user.display_name}"
-        if (qr:= await self.bot.database.get_user_qr(user)) != '0':
+        if (qr:= await self.bot.database.get_user_qr(user)) != '0' and image_path_check(qr):
             await interaction.response.send_message(content=content, file=discord.File(fp=qr, filename="qr.png"))
         elif (p := await self.bot.database.get_user_phone(user)) != '0':
             await interaction.response.send_message(content=content, file=discord.File(fp=PromptPay.to_byte_QR(p, amount), filename="qr.png"))

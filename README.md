@@ -22,18 +22,22 @@ Before you can run this bot, make sure you have the following installed:
 
 5. In the `.env` file, define the following environment variables:
    - `TOKEN`: Your API token or secret key.
+   - `CLIENT_ID` : Your discord client id.
    - `DB_HOST`: The hostname or IP address of your database server.
+   - `DB_PORT` : The port of your database server. 
    - `DB_USER`: The username for connecting to the database.
-   - `DB_PASSWORD`: The password for the database user.
+   - `DB_PASS`: The password for the database user.
    - `DB_NAME`: The name of your database.
 
    The `.env` file should look like this:
 
    ```plaintext
    TOKEN=your_api_token_here
+   CLIENT_ID=your_bot_client_id_here
    DB_HOST=your_database_host_here
+   DB_PORT=your_database_port_here
    DB_USER=your_database_user_here
-   DB_PASSWORD=your_database_password_here
+   DB_PASS=your_database_password_here
    DB_NAME=your_database_name_here
    ```
 
