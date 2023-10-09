@@ -30,8 +30,8 @@ class Show_User_Dropdown(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
         user_id = int(self.values[0])
-        self.view.user_id = user_id
         user = self.ctx.guild.get_member(user_id)
+        self.view.user= user
         embed, f = user_embed(await self.get_user(user), user)
 
        
@@ -48,14 +48,14 @@ class Show_User_View(discord.ui.View):
     def __init__(self, ctx: commands.Context, bot: 'Oppy', user: discord.User, all_users: dict,  *, timeout: float = 180.0, ephemeral: bool = False):
         super().__init__(timeout=timeout)
         self.ctx = ctx
-        self.user_id = user.id
+        self.user = user
         self.bot = bot
 
         self.add_item(Show_User_Dropdown(bot, self, all_users, ephemeral))
     
     @discord.ui.button(label="phone", style=discord.ButtonStyle.gray)
     async def send_phone(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message(await self.bot.database.get_user_phone(interaction.user), ephemeral=True)
+        await interaction.response.send_message(await self.bot.database.get_user_phone(self.user), ephemeral=True)
 
     async def on_timeout(self):
         for child in self.children:

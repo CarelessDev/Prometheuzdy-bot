@@ -126,7 +126,7 @@ class Citizen(commands.Cog):
     @commands.hybrid_command()
     async def create_account(self, ctx: commands.Context, user: discord.Member, ephemeral: bool = False):
         """Creates a new account."""
-        await self.bot.database.create_user(user)
+        await self.__ensure_user(user)
         await ctx.send(f"Created account for {user.name}.", ephemeral=ephemeral)
    
     @app_commands.command()
