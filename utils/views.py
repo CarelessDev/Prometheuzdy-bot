@@ -17,7 +17,7 @@ class Show_User_Dropdown(discord.ui.Select):
         # dropdown menus
         # using guild to fetch member instead of bot.get_user() so it will only show users in the guild
         options = [discord.SelectOption(label=self.ctx.guild.get_member(int(
-            user['id'])).display_name, emoji=self.bot.get_emoji(911502994468651010), value=user['id']) for user in all_users]
+            user.get('id'))).display_name, emoji=self.bot.get_emoji(911502994468651010), value=str(user.get('id'))) for user in all_users]
 
         super().__init__(placeholder='Choose your target...',
                             min_values=1, max_values=1, options=options)
@@ -50,7 +50,6 @@ class Show_User_View(discord.ui.View):
         self.ctx = ctx
         self.user = user
         self.bot = bot
-
         self.add_item(Show_User_Dropdown(bot, self, all_users, ephemeral))
     
     @discord.ui.button(label="phone", style=discord.ButtonStyle.gray)

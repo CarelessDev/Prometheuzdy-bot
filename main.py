@@ -7,16 +7,12 @@ import os
 import asyncio
 
 from discord.ext import commands, tasks
-from dotenv import load_dotenv
 from random import choice
-from aiohttp import ClientSession
 
 from utils.data_manager import Database_Manager
-from settings import description, get_activity, initial_extensions, activities
+from settings import description, credentials, initial_extensions, activities
 
-load_dotenv()
-
-print(os.environ.get("DB_PASS"))
+# print(os.environ.get("DB_PASS"))
 
 class Oppy(commands.Bot):
     def __init__(self, database_manager: Database_Manager, testing_guild_id: int = None):
@@ -47,7 +43,7 @@ class Oppy(commands.Bot):
         # This would also be a good place to connect to our database and
         # load anything that should be in memory prior to handling events.
         # Basically: don't 👏 do 👏 shit 👏 in 👏 on_ready. -R. Danny
-        async for guild in self.fetch_guilds(limit=None):
+        async for guild in self.fetch_guilds(limit=None):       # create all guild that this bot is in
             await self.database.create_guild(guild)
 
         # In this case, we are using this to ensure that once we are connected, we sync for the testing guild.
@@ -93,11 +89,7 @@ async def main():
 
     # Here we have a database pool, which do cleanup at exit.
     # We also have our bot, which depends on both of these.
-    async with Database_Manager(host=os.environ.get("DB_HOST"),  # database connection
-                                port=int(os.environ.get("DB_PORT")),                
-                                user=os.environ.get("DB_USER"),
-                                password=os.environ.get("DB_PASS"),
-                                db=os.environ.get("DB_NAME")) as db_manager:
+    async with Database_Manager(**credentials) as db_manager:
         # 2. We become responsible for starting the bot.
         async with Oppy(database_manager=db_manager) as bot:
             await bot.start(os.environ.get("TOKEN"))

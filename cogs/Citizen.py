@@ -7,7 +7,7 @@ import typing, os
 
 
 
-from utils.data_manager import QR_PATH
+from settings import QR_PATH
 from utils.embeds import user_embed, qr_confirmation_embed
 from utils.views import Show_User_View, Confirmation_View
 from utils.promptpay import PromptPay
@@ -16,16 +16,6 @@ from utils.pattern_check import image_path_check
 class Citizen(commands.Cog):
     def __init__(self, bot: 'Oppy') -> None:
         self.bot = bot
-        set_phone = app_commands.ContextMenu(
-            name='set phone number',
-            callback=self.set_phone_from_message,
-        )
-        set_qr = app_commands.ContextMenu(
-            name='set qr code',
-            callback=self.set_qr_from_message,
-        )
-        self.bot.tree.add_command(set_phone)
-        self.bot.tree.add_command(set_qr)
         self._routine = {}
 
     async def cog_unload(self) -> None:
@@ -64,6 +54,7 @@ class Citizen(commands.Cog):
             pass
 
         all_users = await self.bot.database.get_user(guild_id=interaction.guild.id)
+        
         view = Show_User_View(interaction, self.bot, user, all_users, timeout=180.0, ephemeral=ephemeral)
 
         if (u := await self.bot.database.get_user(user=user)):
@@ -109,18 +100,6 @@ class Citizen(commands.Cog):
             else:
                 await interaction.edit_original_response(content="Cancelled.", view=None, embed=None)
 
-    # message menu commands ====================================================================================================
-
-    async def set_phone_from_message(self, interaction: discord.Interaction, message: discord.Message) -> None:
-        user = message.author
-        await self.__ensure_user(user)
-        phone = message.content
-        await self.__set_phone(interaction, phone, user, ephemeral=True)
-    async def set_qr_from_message(self, interaction: discord.Interaction, message: discord.Message) -> None:
-        user = message.author
-        await self.__ensure_user(user)
-        # TODO: check if the attachment is in the message
-
     # slash and context commands ====================================================================================================
 
     @commands.hybrid_command()
@@ -154,6 +133,7 @@ class Citizen(commands.Cog):
         await self.__ensure_user(user)
         content = f"```Paying {user.display_name} {amount} Baht```" if amount else f"Paying {user.display_name}"
         if (qr:= await self.bot.database.get_user_qr(user)) != '0' and image_path_check(qr):
+            print('qr found')
             await interaction.response.send_message(content=content, file=discord.File(fp=qr, filename="qr.png"))
         elif (p := await self.bot.database.get_user_phone(user)) != '0':
             await interaction.response.send_message(content=content, file=discord.File(fp=PromptPay.to_byte_QR(p, amount), filename="qr.png"))
