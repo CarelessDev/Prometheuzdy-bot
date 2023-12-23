@@ -36,7 +36,7 @@ activities = [get_activity('gaming', 'with your wife'),
 QR_PATH = "data/qr_codes"
 
 credentials = {'host': os.environ.get("DB_HOST"),  # database connection
-               'port': int(os.environ.get("DB_PORT")),
-               'user': "zu2",
-               'password': 'Oppy987',
-               'database': 'oppybot'}
+               'port': 5432,
+               'user': 'postgres',
+               'password': 'password',
+               'database': 'oppy'}
