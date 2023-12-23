@@ -35,7 +35,7 @@ activities = [get_activity('gaming', 'with your wife'),
 
 QR_PATH = "data/qr_codes"
 
-credentials = {'host': os.environ.get("DB_HOST"),  # database connection
+credentials = {'host': "database.discord-bot",  # database connection
                'port': 5432,
                'user': 'postgres',
                'password': 'password',
